@@ -315,7 +315,26 @@ class IdlBin(PbData):
 
     def __repr__(self):
         return 'SWMF IDL-Binary file "%s"' % (self.attrs['file'])
-    
+
+    def detectEndianness(self,infile):
+
+        import struct
+
+        # On the first try, we may fail because of wrong-endianess.
+        # If that is the case, swap that endian and try again.
+        EndChar = '<' # Endian marker (default: little.)
+        self.attrs['endian']='little'
+        RecLenRaw = infile.read(4)
+
+        RecLen = ( struct.unpack(EndChar+'l', RecLenRaw) )[0]
+        if (RecLen > 10000) or (RecLen < 0):
+            EndChar = '>'
+            self.attrs['endian']='big'
+            RecLen = ( struct.unpack(EndChar+'l', RecLenRaw) )[0]
+
+        return EndChar,RecLen
+
+
     def read(self):
         '''
         This method reads an IDL-formatted BATS-R-US output file and places
@@ -329,18 +348,7 @@ class IdlBin(PbData):
         # Note that Fortran writes integer buffers around records, so
         # we must parse those as well.
         infile = open(self.attrs['file'], 'rb')
-
-        # On the first try, we may fail because of wrong-endianess.
-        # If that is the case, swap that endian and try again.
-        EndChar = '<' # Endian marker (default: little.)
-        self.attrs['endian']='little'
-        RecLenRaw = infile.read(4)
-
-        RecLen = ( struct.unpack(EndChar+'l', RecLenRaw) )[0]
-        if (RecLen > 10000) or (RecLen < 0):
-            EndChar = '>'
-            self.attrs['endian']='big'
-            RecLen = ( struct.unpack(EndChar+'l', RecLenRaw) )[0]
+        EndChar,RecLen=self.detectEndianness(infile)
 
         header = ( struct.unpack(EndChar+'%is'%RecLen,
                                  infile.read(RecLen)) )[0]    
@@ -464,6 +472,42 @@ class IdlBin(PbData):
             for key in list(self.keys()):
                 if key=='grid': continue
                 self[key] = self[key][SortIndex]
+
+        infile.close()
+
+class TreeBin(IdlBin):
+    '''
+    A class that reads/parses a binary AMR tree file from SWMF.
+
+    Usage:
+    >>>data = spacepy.pybats.IdlBin('binary_file.tree')
+    '''
+
+    def __init__(self, *args, **kwargs):
+        super(TreeBin, self).__init__(*args, **kwargs)  # Init as PbData.
+
+    def read(self):
+        '''
+        This method reads an IDL-formatted BATS-R-US output file and places
+        the data into the object.  The file read is self.filename which is
+        set when the object is instantiation.
+        '''
+        import numpy as np
+        import struct
+
+        # Open, read, and parse the file into numpy arrays.
+        # Note that Fortran writes integer buffers around records, so
+        # we must parse those as well.
+        infile = open(self.attrs['file'], 'rb')
+        EndChar,RecLen=self.detectEndianness(infile)
+
+        self.attrs['nDim'],self.attrs['nInfo'],self.attrs['nNode']=struct.unpack(EndChar+'3l',infile.read(12))
+        nDim,nNode,nInfo=self.attrs['nDim'],self.attrs['nInfo'],self.attrs['nNode']
+        self.attrs['iRatio']=struct.unpack(EndChar+'{0:d}l'.format(nDim),infile.read(4*nDim))
+        self.attrs['nRoot']=struct.unpack(EndChar+'{0:d}l'.format(nDim),infile.read(4*nDim))
+
+        self['tree']=dmarray(struct.unpack(EndChar+'{0:d}l'.format(nInfo*nNode),infile.read(4*nInfo*nNode)))
+        self['tree'].reshape(nInfo,nNode)
 
         infile.close()
 
