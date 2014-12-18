@@ -789,7 +789,7 @@ class LogFile(PbData):
         if type(target) == plt.Figure:
             fig = target
             ax = fig.add_subplot(loc)
-        elif type(target).__base__ == plt.Axes:
+        elif isinstance(target,plt.Axes):
             ax = target
             fig = ax.figure
         else:

@@ -785,7 +785,7 @@ class Bats2d(IdlBin):
             fig = target
             ax = fig.add_subplot(loc)
             ax.set_aspect('equal')
-        elif type(target).__base__ == plt.Axes:
+        elif isinstance(target,plt.Axes):
             ax = target
             fig = ax.figure
         else:
@@ -854,7 +854,7 @@ class Bats2d(IdlBin):
         if type(target) == plt.Figure:
             fig = target
             ax  = fig.add_subplot(loc)
-        elif type(target).__base__ == plt.Axes:
+        elif isinstance(target,plt.Axes):
             ax  = target
             fig = ax.figure
         else:
@@ -1106,7 +1106,7 @@ class Bats2d(IdlBin):
         if type(target) == plt.Figure:
             fig = target
             ax  = fig.add_subplot(loc)
-        elif type(target).__base__ == plt.Axes:
+        elif isinstance(target,plt.Axes):
             ax  = target
             fig = ax.figure
         else:
@@ -1219,7 +1219,7 @@ class Bats2d(IdlBin):
         if type(target) == plt.Figure:
             fig = target
             ax  = fig.add_subplot(loc)
-        elif type(target).__base__ == plt.Axes:
+        if isinstance(target,plt.Axes):
             ax  = target
             fig = ax.figure
         else:
@@ -1450,7 +1450,7 @@ class Mag(PbData):
         if type(target) == plt.Figure:
             fig = target
             ax = fig.add_subplot(loc)
-        elif type(target).__base__ == plt.Axes:
+        elif isinstance(target,plt.Axes):
             ax = target
             fig = ax.figure
         else:
@@ -1492,7 +1492,7 @@ class Mag(PbData):
         if type(target) == plt.Figure:
             fig = target
             ax = fig.add_subplot(loc)
-        elif type(target).__base__ == plt.Axes:
+        elif isinstance(target,plt.Axes):
             ax = target
             fig = ax.figure
         else:
@@ -1732,7 +1732,7 @@ class GeoIndexFile(LogFile):
         if type(target) == plt.Figure:
             fig = target
             ax = fig.add_subplot(pos)
-        elif type(target).__base__ == plt.Axes:
+        elif isinstance(target,plt.Axes):
             ax = target
             fig = ax.figure
         else:
@@ -1793,7 +1793,7 @@ class VirtSat(LogFile):
         if type(target) == plt.Figure:
             fig = target
             ax = fig.add_subplot(loc)
-        elif type(target).__base__ == plt.Axes:
+        elif isinstance(target,plt.Axes):
             ax = target
             fig = ax.figure
         else:
