@@ -490,7 +490,7 @@ class TreeBin(IdlBin):
         '''
         This method reads an IDL-formatted BATS-R-US output file and places
         the data into the object.  The file read is self.filename which is
-        set when the object is instantiation.
+        set when the object is instantiated.
         '''
         import numpy as np
         import struct
