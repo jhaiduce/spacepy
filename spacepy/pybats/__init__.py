@@ -514,6 +514,77 @@ class TreeBin(IdlBin):
 
         infile.close()
 
+class BatsHeader(PbData):
+    '''
+    A class that reads/parses a binary AMR tree file from SWMF.
+
+    Usage:
+    >>>data = spacepy.pybats.IdlBin('binary_file.tree')
+    '''
+
+    def __init__(self, filename, *args, **kwargs):
+        super(BatsHeader, self).__init__(*args, **kwargs)  # Init as PbData.
+        self.attrs['file'] = filename   # Save file name.
+        self.read()   # Read binary file.
+
+    def read(self):
+        '''
+        This method reads a BATS-R-US header file and places
+        the data into the object.  The file read is self.filename which is
+        set when the object is instantiated.
+        '''
+        import numpy as np
+
+        # Open, read, and parse the file into numpy arrays.
+        # Note that Fortran writes integer buffers around records, so
+        # we must parse those as well.
+        infile = open(self.attrs['file'], 'rb')
+
+        filename=infile.readline()
+
+        self.attrs['nProc'],=self._parse_line(infile,int)
+        self.attrs['n_step'],=self._parse_line(infile,int)
+        self.attrs['t'],=self._parse_line(infile)
+        self.attrs['plot_range']=self._parse_line(infile)
+        fields=self._parse_line(infile,str,namefields=3)
+        self.attrs['plot_dx']=dmarray(fields[0:3],dtype=float)
+        self.attrs['dxmin']=dmarray(fields[3:6],dtype=float)
+        self.attrs['ncell']=int(fields[6])
+        self.attrs['nplotvar'],=self._parse_line(infile,int)
+        self.attrs['neqpar'],=self._parse_line(infile,int)
+        self.attrs['eqpar']=dmarray(self._parse_line(infile,float))
+        self.attrs['varnames']=infile.readline().split()
+        self.attrs['units']=infile.readline().split()
+        self.attrs['save_binary']=self._parse_line(infile,self._strtobool)
+        self.attrs['nByteReal']=self._parse_line(infile,int)
+        self.attrs['gridtype'],=infile.readline().split()
+        if self.attrs['gridtype']=='genr':
+            self.attrs['nRgen'],=self._parse_line(infile,int)
+            self.attrs['LogRgen']=dmarray(self._parse_line(infile))
+        self.attrs['dtype'],=infile.readline().split()
+        self.attrs['nRoot']=dmarray(self._parse_line(infile,int))
+        self.attrs['nIJK']=dmarray(self._parse_line(infile,int))
+        self.attrs['isPeriodic']=dmarray(self._parse_line(infile,self._strtobool))
+        self.attrs['cLight'],self.attrs['thetaTilt'],self.attrs['rBody']=self._parse_line(infile,namefields=3)
+
+        infile.close()
+
+    def _strtobool(self,string):
+        if string=='T':
+            return True
+        elif string=='F':
+            return False
+        else:
+            raise ValueError('Can''t convert string '+string+' to boolean')
+
+    def _parse_line(self,infile,convtype=float,namefields=1):
+        """
+        Most lines of the BATSRUS header files contain one or more numeric values followed by one or more variable names. This function parses reads a line of that form.
+        """
+        line=infile.readline()
+        fields=line.split()
+        return [convtype(field) for field in fields[:-namefields]]
+
 class LogFile(PbData):
     ''' An object to read and handle SWMF-type logfiles.
 
