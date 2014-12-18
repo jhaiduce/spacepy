@@ -503,11 +503,14 @@ class TreeBin(IdlBin):
 
         self.attrs['nDim'],self.attrs['nInfo'],self.attrs['nNode']=struct.unpack(EndChar+'3l',infile.read(12))
         nDim,nNode,nInfo=self.attrs['nDim'],self.attrs['nInfo'],self.attrs['nNode']
+        (OldLen, RecLen) = struct.unpack(EndChar+'2l', infile.read(8))
         self.attrs['iRatio']=struct.unpack(EndChar+'{0:d}l'.format(nDim),infile.read(4*nDim))
+        (OldLen, RecLen) = struct.unpack(EndChar+'2l', infile.read(8))
         self.attrs['nRoot']=struct.unpack(EndChar+'{0:d}l'.format(nDim),infile.read(4*nDim))
+        (OldLen, RecLen) = struct.unpack(EndChar+'2l', infile.read(8))
 
         tree=dmarray(struct.unpack(EndChar+'{0:d}l'.format(nInfo*nNode),infile.read(4*nInfo*nNode)))
-        self['tree']=tree.reshape(nInfo,nNode,order='F')
+        self['tree']=tree.reshape((nInfo,nNode),order='C')
 
         infile.close()
 
