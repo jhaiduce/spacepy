@@ -462,6 +462,7 @@ class IdlBin(PbData):
                 self[names[i]] = self[names[i]].reshape(self['grid'])
 
         # Unstructured data can be in any order, so let's sort it.
+        """
         if gtyp == 'Unstructured':
             gridtotal = np.zeros(npts)
             offset = 0.0  # The offset ensures no repeating vals while sorting.
@@ -472,7 +473,7 @@ class IdlBin(PbData):
             for key in list(self.keys()):
                 if key=='grid': continue
                 self[key] = self[key][SortIndex]
-
+        """
         infile.close()
 
 class TreeBin(IdlBin):
@@ -1162,13 +1163,13 @@ class ImfInput(PbData):
         for i, line in enumerate(lines):
             parts = line.split()
             self['time'][i]=(dt.datetime(
-                    int(parts[0]), #year
-                    int(parts[1]), #month
-                    int(parts[2]), #day
-                    int(parts[3]), #hour
-                    int(parts[4]), #min
-                    int(parts[5]), #sec
-                    int(parts[6]) * 1000 #micro seconds
+                    int(float(parts[0])), #year
+                    int(float(parts[1])), #month
+                    int(float(parts[2])), #day
+                    int(float(parts[3])), #hour
+                    int(float(parts[4])), #min
+                    int(float(parts[5])), #sec
+                    int(float(parts[6])) * 1000 #micro seconds
                     )) 
             for j, name in enumerate(self.attrs['var']):
                 self[name][i] = float(parts[7+j])
@@ -1406,13 +1407,13 @@ class SatOrbit(PbData):
         for i, line in enumerate(raw):
             parts = line.split()
             self['time'][i]=dt.datetime(
-                    int(parts[0]), #year
-                    int(parts[1]), #month
-                    int(parts[2]), #day
-                    int(parts[3]), #hour
-                    int(parts[4]), #min
-                    int(parts[5]), #sec
-                    int(parts[6]) * 1000 #micro seconds
+                    int(float(parts[0])), #year
+                    int(float(parts[1])), #month
+                    int(float(parts[2])), #day
+                    int(float(parts[3])), #hour
+                    int(float(parts[4])), #min
+                    int(float(parts[5])), #sec
+                    int(float(parts[6])) * 1000 #micro seconds
                     )
             self['xyz'][:,i] = parts[7:]
 
