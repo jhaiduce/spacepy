@@ -481,7 +481,7 @@ class TreeBin(IdlBin):
     A class that reads/parses a binary AMR tree file from SWMF.
 
     Usage:
-    >>>data = spacepy.pybats.IdlBin('binary_file.tree')
+    >>>data = spacepy.pybats.TreeBin('binary_file.tree')
     '''
 
     def __init__(self, *args, **kwargs):
@@ -517,10 +517,10 @@ class TreeBin(IdlBin):
 
 class BatsHeader(PbData):
     '''
-    A class that reads/parses a binary AMR tree file from SWMF.
+    A class that reads/parses a BATS-R-US .info header file
 
     Usage:
-    >>>data = spacepy.pybats.IdlBin('binary_file.tree')
+    >>>data = spacepy.pybats.BatsHeader('header_file.info')
     '''
 
     def __init__(self, filename, *args, **kwargs):
